@@ -20,7 +20,7 @@ quotesRouter.route('/')
         // Check if the quote is empty
         if(bQuote == undefined || bQuote == ""){
             res.status(400).json({
-                "error": "Invalid Quote"
+                "error": "Quote was not provided or was an empty string"
             });
             return ;
         }
@@ -59,6 +59,35 @@ quotesRouter.route('/:id')
             "quoteID" : id,    
             'quote': quote
         });
+    })
+
+    .put((req, res) => {
+        let id = Number(req.params.id)
+        let origianlQuote = quotes.get(id);
+        let bQuote = req.body.quote;
+
+        if(origianlQuote == undefined){
+            res.status(400).json({
+                "error": "Invalid ID"
+            })
+            return ;
+        }
+
+        if(bQuote == undefined  || bQuote == ""){
+            res.status(400).json({
+                "error": "Quote was not provided or was an empty string"
+            })
+            return ;
+        }
+
+        quotes.set(id, bQuote)
+        res.status(200).json({
+            "msg" : "Successfully Edited Quote",
+            'quoteID' : id,
+            'quote': quotes.get(id)
+        })
+
+        
     })
 
 module.exports = quotesRouter;
