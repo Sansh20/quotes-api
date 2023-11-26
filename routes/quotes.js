@@ -85,9 +85,33 @@ quotesRouter.route('/:id')
             "msg" : "Successfully Edited Quote",
             'quoteID' : id,
             'quote': quotes.get(id)
-        })
+        })        
+    })
 
+    .delete((req, res) => {
         
+        let id = Number(req.params.id)
+        let quote = quotes.get(id);
+
+        if(quote == undefined){
+            res.status(400).json({
+                "error": "Invalid ID"
+            })
+            return ;
+        }
+
+        quotes.delete(id);
+        if(quotes.get(id) == undefined){
+            res.status(200).json({
+                "msg" : "Successfully Deleted Quote",
+            }) 
+        }
+        else{
+            res.status(500).json({
+                "error" : "Quote was not deleted. Please try again."
+            })
+        }
+
     })
 
 module.exports = quotesRouter;
