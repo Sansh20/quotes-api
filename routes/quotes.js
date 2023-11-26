@@ -4,7 +4,7 @@ let quotes = require('../public/data/quotesData');
 const quotesRouter = express.Router();
 
 quotesRouter.route('/')
-    .get((req, res, next) => {
+    .get((req, res) => {
         let randIdx = Math.floor(Math.random() * (quotes.size-1));
         res.status(200).json({
             "quoteID" : randIdx,    
@@ -12,13 +12,14 @@ quotesRouter.route('/')
         });
     })
 
-    .post((req, res, next) => {
-        let id = quotes.size
+    .post((req, res) => {
+
+        let id = quotes.size;
+        let bQuote = req.body.quote; 
 
         // Check if the quote is empty
-        if(req.body.quote == undefined || req.body.quote == ""){
+        if(bQuote == undefined || bQuote == ""){
             res.status(400).json({
-                "status" : "fail",
                 "error": "Invalid Quote"
             });
             return ;
@@ -26,18 +27,17 @@ quotesRouter.route('/')
 
         // Check if the quote already exists
         for(let [k, v] of quotes){
-            if(v.toLowerCase() === req.body.quote.toLowerCase()){
+            if(v.toLowerCase() === bQuote.toLowerCase()){
                 res.status(400).json({
-                    "status" : "fail",
                     "error": "Quote Already Exists, id: " + k
                 })
                 return ;
             }
         }
 
-        quotes.set(id, req.body.quote)
+        quotes.set(id, bQuote)
         res.status(200).json({
-            "status" : "success",
+            "msg" : "Successfully Added Quote",
             'quoteID' : id,    
             'quote': quotes.get(id)
         })
