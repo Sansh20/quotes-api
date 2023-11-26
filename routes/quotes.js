@@ -44,4 +44,21 @@ quotesRouter.route('/')
     
     })
 
+quotesRouter.route('/:id')
+    .get((req, res) =>{
+        let id = Number(req.params.id);
+        let quote = quotes.get(id);
+        if(quote == undefined){
+            res.status(400).json({
+                "error": "Invalid ID"
+            })
+            return ;
+        }
+
+        res.status(200).json({
+            "quoteID" : id,    
+            'quote': quote
+        });
+    })
+
 module.exports = quotesRouter;
