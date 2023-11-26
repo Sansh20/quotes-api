@@ -5,11 +5,15 @@ const quotesRouter = express.Router();
 
 quotesRouter.route('/')
     .get((req, res) => {
-        let randIdx = Math.floor(Math.random() * (quotes.size-1));
+
+        let quoteArr = Array.from(quotes);
+        let quote = quoteArr[Math.floor(Math.random() * quoteArr.length)]
+
         res.status(200).json({
-            "quoteID" : randIdx,    
-            'quote': quotes.get(randIdx)
+            "quoteID" : quote[0],    
+            'quote': quote[1]
         });
+        
     })
 
     .post((req, res) => {
