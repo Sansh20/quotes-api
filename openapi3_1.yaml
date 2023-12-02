@@ -1,0 +1,191 @@
+openapi: 3.1.0
+info:
+  title: Quotes API
+  description: A simple API that uses an in-memory dataset for storing Quotes and allows requesting random quotes, updates to quotes, adding new quotes and deleting quotes, etc.
+  version: 1.0.0
+paths:
+  /quotes:
+    get:
+      summary: Get a random quote
+      responses:
+        '200':
+          description: Returned a random quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quoteSuccessResponse'
+
+    post:
+      summary: Add a new quote to the in-memory map
+      requestBody:
+        $ref: '#/components/requestBodies/quote'      
+      responses:
+        '200':
+          description: Successfully added the quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "Confirmation message"
+                    default: "Successfully Added Quote"
+                  quoteId:
+                    type: integer
+                    description: "The ID of the newly added quote"
+                  quote:
+                    type: string
+                    description: "The newly added quote"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: |
+                      Can occur in two cases:
+                        * "Quote was not provided or was an empty string" : When the the request body did not contain a quote property or the quote property had an empty value
+                        * "Quote Already Exists, id: {id}" : When the quote provided in the request body, already exists, this message also provides with the id of the existing quote.
+                    
+                    enum: 
+                    - "Quote was not provided or was an empty string"
+                    - "Quote Already Exists, id: {id}"
+                
+          
+  /quotes/{id}:
+    get:
+      summary: "Get a specific quote using its ID"
+      parameters: 
+      - $ref: '#/components/parameters/pathID'
+      responses:
+        '200':
+          description: Retrieved the quote that corresponds with the id given in parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quoteSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invalidID'
+
+    put:
+      summary: "Edit a specific quote using its ID"
+      parameters: 
+      - $ref: '#/components/parameters/pathID'
+      requestBody:
+        $ref: '#/components/requestBodies/quote'
+      responses:
+        '200':
+          description: Successfully edited the quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "Confirmation message"
+                    default: "Successfully Edited Quote"
+                  quoteId:
+                    type: integer
+                    description: "The ID of the edited quote"
+                  quote:
+                    type: string
+                    description: "The edited quote"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: |
+                      Can occur in two cases:
+                        * "Quote was not provided or was an empty string" : When the the request body did not contain a quote property or the quote property had an empty value
+                        * "Invalid ID" : User provided an ID that does not exist in the map
+                    
+                    enum: 
+                    - "Quote was not provided or was an empty string"
+                    - "Invalid ID"
+
+    delete:
+      summary: "Delete a specific quote using its ID"
+      parameters: 
+      - $ref: '#/components/parameters/pathID'
+      responses:
+        '200':
+          description: Successfully Deleted the quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: Confirmation message
+                    default: Successfully Deleted Code
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invalidID'
+        '500':
+          description: The quote was not deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Message indicating internal error that caused the quote to not be deleted
+                    default: Quote was not deleted. Please try again.
+
+
+components:
+  parameters:
+    pathID:
+      name: id
+      schema: 
+        type: integer
+      in: path
+      required: true
+
+  schemas:
+    quoteSuccessResponse:
+      type: object
+      properties:
+        quoteId:
+          type: integer
+          description: The Id of the quote returned
+        quote:
+          type: string
+          description: The quote corresponding to the Id
+    
+    invalidID:
+      type: object
+      properties:
+        "error":
+          description: User provided an ID that does not exist in the map
+          default: "Invalid ID"
+
+  requestBodies:
+    quote: 
+      content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quote:
+                  type: string
+                  description: Quote text.
